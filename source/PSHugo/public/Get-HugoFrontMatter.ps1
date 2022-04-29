@@ -37,6 +37,8 @@ Function Get-HugoFrontMatter {
         $yaml_content = '(?sm)---(.*?)---'
         $toml_content = '(?sm)+++(.*?)+++'
 
+        $json_content = '(?sm){(.*?)}'
+
         $org_key = '^#\+(\w+):\s+(.+)$'
         $org_key_list = '^#\+(\w+)\[\]:\s+(.*)'
     }
@@ -56,9 +58,18 @@ Function Get-HugoFrontMatter {
                 $null = $file_contents -match $toml_content
                 if ($Matches.Count -gt 0) {
                     Write-Verbose "toml front matter $($Matches.1)"
-                    $front_matter = $Matches.1 | ConvertFrom-Ini
+                    # $front_matter = $Matches.1 | ConvertFrom-Ini
                     $Matches.clear()
                 }
+            }
+            'json' {
+                $null = $file_contents -match $json_content
+                if ($Matches.Count -gt 0) {
+                    Write-Verbose "json front matter $($Matches.1)"
+                    $front_matter = $Matches.1 | ConvertFrom-Json
+                    $Matches.clear()
+                }
+
             }
             'org' {
                 $front_matter = @{}
